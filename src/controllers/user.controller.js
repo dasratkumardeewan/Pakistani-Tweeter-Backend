@@ -290,6 +290,82 @@ const changePassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Password changed successfully"));
 });
 
+const changeProfileDetails = asyncHandler(async (req, res) => {
+  const { fullName, bio, country, city } = req.body;
+
+  const updateFields = {};
+
+  if (fullName?.trim()) {
+    updateFields.fullName = fullName;
+  }
+
+  if (bio?.trim()) {
+    updateFields.bio = bio;
+  }
+
+  if (country?.trim()) {
+    updateFields.country = country;
+  }
+
+  if (city?.trim()) {
+    updateFields.city = city;
+  }
+
+  const user = await User.findByIdAndUpdate(req.user._id, updateFields, {
+    new: true,
+  });
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Profile details updated successfully"));
+});
+
+const updateProfilePicture = asyncHandler(async (req, res) => {
+  const profileImageLocalPath = req.file?.path;
+  if (!profileImageLocalPath) {
+    throw new ApiError(400, "Profile image is required");
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    { profileImage: profileImageLocalPath },
+    { new: true },
+  );
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Profile picture updated successfully"));
+});
+
+const updateCoverPicture = asyncHandler(async (req, res) => {
+  const coverImageLocalPath = req.file?.path;
+  if (!coverImageLocalPath) {
+    throw new ApiError(400, "Cover image is required");
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    { coverImage: coverImageLocalPath },
+    { new: true },
+  );
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Cover picture updated successfully"));
+});
+
 export {
   register,
   verifyOTP,
@@ -297,5 +373,10 @@ export {
   logout,
   refreshAccessToken,
   getUserProfile,
-  changePassword
+  changePassword,
+  changeProfileDetails,
+  updateProfilePicture,
+  updateCoverPicture,
+  updateProfilePicture,
+  updateCoverPicture,
 };
