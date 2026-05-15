@@ -1,6 +1,15 @@
 import { Router } from "express";
-import { register,verifyOTP } from "../controllers/user.controller.js";
+import {
+  register,
+  verifyOTP,
+  login,
+  logout,
+  refreshAccessToken,
+  getUserProfile,
+  changePassword,
+} from "../controllers/user.controller.js";
 import { upload } from "../middleware/multer.middleware.js";
+import { verifyJWT } from "../middleware/auth.middleware.js";
 
 const router = Router();
 router.route("/register").post(
@@ -17,6 +26,13 @@ router.route("/register").post(
   register,
 );
 
-
 router.route("/verify-otp").post(verifyOTP);
+router.route("/login").post(login);
+
+// Secured Routes
+router.route("/logout").post(verifyJWT, logout);
+router.route("/refresh-token").post(refreshAccessToken);
+router.route("/profile").get(verifyJWT, getUserProfile);
+router.route("/change-password").post(verifyJWT, changePassword);
+
 export default router;
